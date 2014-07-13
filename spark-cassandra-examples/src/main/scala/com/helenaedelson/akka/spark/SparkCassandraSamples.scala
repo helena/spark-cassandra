@@ -15,7 +15,7 @@
  */
 
 package com.helenaedelson.akka.spark
- 
+
 import com.typesafe.config.{ConfigFactory, Config}
 
 import org.apache.spark._

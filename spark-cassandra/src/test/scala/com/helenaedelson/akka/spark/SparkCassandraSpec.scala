@@ -41,8 +41,9 @@ class SparkCassandraSpec extends AbstractSpec {
     }
     "work with basic RDD functions" in {
       val data = 1 to 10000
-      val rdd = spark.parallelize(data)
-      val result = rdd.filter(_ < 10).collect()
+      val result = spark.parallelize(data)
+        .filter(_ < 10)
+        .collect()
       result.last should be(9)
     }
 

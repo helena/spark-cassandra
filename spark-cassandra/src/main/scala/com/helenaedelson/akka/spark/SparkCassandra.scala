@@ -2,6 +2,8 @@ package com.helenaedelson.akka.spark
 
 import java.util.concurrent.atomic.AtomicBoolean
 
+import org.apache.spark.streaming.{Seconds, StreamingContext}
+
 import scala.reflect.ClassTag
 
 import akka.actor._
@@ -41,14 +43,16 @@ class SparkCassandra(val system: ExtendedActorSystem) extends Extension with Log
    * The master URL to connect to, such as "local" to run locally with one thread, "local[4]" to
    * run locally with 4 cores, or "spark://master:7077" to run on a Spark standalone cluster.
    */
-  final val config = new SparkConf(SparkLoadDefaults)
+  final val conf = new SparkConf(SparkLoadDefaults)
     .setAppName(SparkAppName)
     .setJars(SparkLoadJars)
     .setMaster(SparkMasterURI)
     .setAll(CassandraOptions)
 
+  // TODO val sparkStreaming = new StreamingContext(conf, Seconds(1))
+
   val spark: SparkContext = {
-    val sc = new SparkContext(config)
+    val sc = new SparkContext(conf)
     require(Option(sc).isDefined, "'spark' must be defined.")
     log.info(s"$sc created.")
     sc
