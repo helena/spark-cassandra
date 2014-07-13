@@ -15,18 +15,10 @@
  */
 
 package com.helenaedelson.akka.spark
-
-import java.util.concurrent.atomic.AtomicBoolean
-
+ 
 import com.typesafe.config.{ConfigFactory, Config}
 
-import scala.reflect.ClassTag
-
-import akka.actor._
-import org.apache.spark.rdd.RDD
 import org.apache.spark._
-import com.datastax.spark.connector.rdd.CassandraRDD
-import com.datastax.spark.connector.rdd.reader.RowReaderFactory
 
 /**
  * Stubbed out for future samples.
