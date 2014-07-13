@@ -1,12 +1,11 @@
 spark-cassandra
 ===============
 
-An Akka Extension for easy integration of spark and cassandra in Akka micro services.
+An [Akka Extension](http://doc.akka.io/docs/akka/snapshot/intro/what-is-akka.html) for easy integration of [Spark](http://spark.apache.org) and [Cassandra](http://cassandra.apache.org) in Akka micro services, etc.
 
-Spark Streaming is currently being added to the core SparkContext in place currently. I am adding it to the
-driver project: (https://github.com/datastax/spark-cassandra-connector/issues/55)
+[Spark Streaming](http://spark.apache.org/streaming/) is currently being added to the core SparkContext in place currently. I am adding it to the [connector project]: (https://github.com/datastax/spark-cassandra-connector/issues/55)
 
-Documentation coming, this project is still being developed, but for now:
+Full documentation coming, this project is still being developed, but for now:
 
 # Usage:
 
@@ -21,7 +20,9 @@ val extension = SparkCassandra(system)
 import extension._
 
 val data = 1 to 10000
-val result = spark.parallelize(data).filter(_ < 10).collect()
+val results = spark.parallelize(data)
+  .filter(_ < 10)
+  .collect()
 ```
 
 ## Basic Usage for Cassandra
