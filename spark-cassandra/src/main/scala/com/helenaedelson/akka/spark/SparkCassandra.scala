@@ -1,13 +1,14 @@
 package com.helenaedelson.akka.spark
 
 import java.util.concurrent.atomic.AtomicBoolean
+
 import scala.reflect.ClassTag
 
 import akka.actor._
-import com.datastax.driver.spark.rdd.CassandraRDD
-import com.datastax.driver.spark.rdd.reader.RowReaderFactory
 import org.apache.spark.rdd.RDD
-import org.apache.spark.{ Logging, SparkContext, SparkConf }
+import org.apache.spark._
+import com.datastax.spark.connector.rdd.CassandraRDD
+import com.datastax.spark.connector.rdd.reader.RowReaderFactory
 
 /**
  * SparkCassandra Extension is and factory for creating SparkCassandra extension.
@@ -29,8 +30,6 @@ class SparkCassandra(val system: ExtendedActorSystem) extends Extension with Log
   val settings = new SparkCassandraSettings(system.settings.config)
   import settings._
 
-  // TBD val cluster = Cluster(system)
-
   private val _isTerminated = new AtomicBoolean(false)
 
   /**
@@ -42,17 +41,20 @@ class SparkCassandra(val system: ExtendedActorSystem) extends Extension with Log
    * The master URL to connect to, such as "local" to run locally with one thread, "local[4]" to
    * run locally with 4 cores, or "spark://master:7077" to run on a Spark standalone cluster.
    */
-  private val config = new SparkConf(true)
+  final val config = new SparkConf(SparkLoadDefaults)
     .setAppName(SparkAppName)
     .setJars(SparkLoadJars)
     .setMaster(SparkMasterURI)
     .setAll(CassandraOptions)
 
-  val spark: SparkContext = new SparkContext(config)
+  val spark: SparkContext = {
+    val sc = new SparkContext(config)
+    require(Option(sc).isDefined, "'spark' must be defined.")
+    log.info(s"$sc created.")
+    sc
+  }
 
-  log.info(s"$spark created.")
-
-  import com.datastax.driver.spark._
+  import com.datastax.spark.connector._
 
   /**
    * Returns a view of a Cassandra table as `CassandraRDD` of type T for CassandraRow tuples.

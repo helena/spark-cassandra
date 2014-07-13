@@ -21,6 +21,7 @@ object Versions {
   val Cassandra       = "2.0.8"
   val CodahaleMetrics = "3.0.1"
   val Config          = "1.2.1"
+  val Connector       = "1.0.0-beta1"
   val DataStax        = "2.0.2"
   val HdrHistogram    =  "1.1.4"
   val JDK             = "1.6" // spark specifies this version for its target jvm :(
@@ -32,7 +33,6 @@ object Versions {
   val ScalaCheck      = "1.11.3"
   val ScalaTest       = "2.1.4"
   val Slf4j           = "1.7.7"
-  val Spark           = "0.9.1"
-  val SparkStreaming  = "1.0.0"
+  val Spark           = "0.9.1"// TODO upgrade to 1.0.1 when the connector does
 
 }

@@ -44,21 +44,21 @@ object Dependencies {
   object Compile {
     import Versions._
 
-    val akkaCluster       = "com.typesafe.akka"           %% "akka-cluster"            % Akka             % "provided"  // ApacheV2
-    val cassSparkDriver   = "com.datastax.cassandra"      %% "cassandra-driver-spark"  % "1.0.0-SNAPSHOT" // TODO remove snapshot when they publish :(
-    val lzf               = "com.ning"                    % "compress-lzf"          % Lzf            % "provided"
-    val sparkStreaming    = "org.apache.spark"            %% "spark-streaming"         % Spark            % "provided"  // ApacheV2
+    val akkaCluster        = "com.typesafe.akka"         %% "akka-cluster"               % Akka               // ApacheV2
+    val cassSparkConnector = "com.datastax.spark"        %% "spark-cassandra-connector"  % Connector        withSources() // ApacheV2
+    val lzf                = "com.ning"                  % "compress-lzf"                % Lzf                 // for spark
+    val sparkStreaming     = "org.apache.spark"          %% "spark-streaming"            % Spark            withSources() // ApacheV2
 
     object Metrics {
-      val hdrHistogram = "org.hdrhistogram"              % "HdrHistogram"              % HdrHistogram     % "test"      // CC0
-      val latencyUtils = "org.latencyutils"              % "LatencyUtils"              % LatencyUtils     % "test"      // Free BSD
-      val metrics      = "com.codahale.metrics"          % "metrics-core"              % CodahaleMetrics  % "test"      // ApacheV2
-      val metricsJvm   = "com.codahale.metrics"          % "metrics-jvm"               % CodahaleMetrics  % "test"      // ApacheV2
+      val hdrHistogram     = "org.hdrhistogram"          % "HdrHistogram"                % HdrHistogram     % "test"      // CC0
+      val latencyUtils     = "org.latencyutils"          % "LatencyUtils"                % LatencyUtils     % "test"      // Free BSD
+      val metrics          = "com.codahale.metrics"      % "metrics-core"                % CodahaleMetrics  % "test"      // ApacheV2
+      val metricsJvm       = "com.codahale.metrics"      % "metrics-jvm"                 % CodahaleMetrics  % "test"      // ApacheV2
     }
 
     object Test {
-      val akkaTestKit   = "com.typesafe.akka"           %% "akka-testkit"              % Akka             % "test"      // ApacheV2
-      val scalatest     = "org.scalatest"               %% "scalatest"                 % ScalaTest        % "test"      // ApacheV2
+      val akkaTestKit      = "com.typesafe.akka"        %% "akka-testkit"                % Akka             % "test"      // ApacheV2
+      val scalatest        = "org.scalatest"            %% "scalatest"                   % ScalaTest        % "test"      // ApacheV2
     }
   }
 
@@ -68,8 +68,10 @@ object Dependencies {
 
   val testkit = Seq(Test.akkaTestKit, Test.scalatest)
 
-  val extension = metrics ++ Seq(akkaCluster, cassSparkDriver, sparkStreaming)
+  val spark = Seq(lzf, sparkStreaming)
 
-  val examples = metrics ++ Seq(akkaCluster, cassSparkDriver, sparkStreaming)
+  val extension = spark ++ metrics ++ Seq(akkaCluster,  cassSparkConnector)
+
+  val examples = spark ++ metrics ++ Seq(akkaCluster, cassSparkConnector)
 
 }

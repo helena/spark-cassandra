@@ -30,7 +30,10 @@ object Settings extends Build {
     organization := "com.helenaedelson",
     scalaVersion := Versions.Scala,
     homepage := Some(url("https://github.com/helena/spark-cassandra")),
-    licenses in ThisBuild := Seq("Apache License, Version 2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0"))
+    licenses in ThisBuild := Seq("Apache License, Version 2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")),
+    resolvers ++= Seq(
+      "Mvn Releases" at "http://repo1.maven.org/maven2/"
+    )
   )
 
   override lazy val settings = super.settings ++ buildSettings ++ Seq(shellPrompt := ShellPrompt.prompt)
@@ -45,13 +48,7 @@ object Settings extends Build {
   lazy val defaultSettings = baseSettings ++ testSettings ++ mimaSettings ++ releaseSettings ++ formatSettings ++ Seq(
     scalacOptions ++= Seq("-encoding", "UTF-8", s"-target:jvm-${Versions.JDK}", "-deprecation", "-feature", "-language:_", "-unchecked", "-Xlog-reflective-calls", "-Xlint"),
     javacOptions ++= Seq("-encoding", "UTF-8", "-source", Versions.JDK, "-target", Versions.JDK, "-Xlint:unchecked", "-Xlint:deprecation"),
-    ivyLoggingLevel in ThisBuild := UpdateLogging.Quiet,
-    unmanagedJars in Compile ++= {
-      val base = baseDirectory.value
-      val baseDirectories = (base / "lib")
-      val customJars = (baseDirectories ** "*.jar")
-      customJars.classpath
-    }
+    ivyLoggingLevel in ThisBuild := UpdateLogging.Quiet
   )
 
   lazy val mimaSettings = mimaDefaultSettings ++ Seq(

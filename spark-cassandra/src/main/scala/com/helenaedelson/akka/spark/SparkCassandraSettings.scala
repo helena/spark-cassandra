@@ -24,6 +24,8 @@ import com.typesafe.config.Config
 import java.util.concurrent.TimeUnit.{ MILLISECONDS ⇒ MILLIS }
 import java.net.URI
 
+import scala.util.Try
+
 /**
  * @author Helena Edelson
  */
@@ -33,21 +35,35 @@ final class SparkCassandraSettings(val config: Config) {
   private val spark = sc.getConfig("spark")
   private val cassandra = sc.getConfig("cassandra")
 
-  val SparkMasterURI: String = spark.getString("master") match {
-    case host if host.nonEmpty ⇒ new URI(s"spark://$host:${spark.getInt("port")}").toString
-    case _                     ⇒ "local"
+  lazy val SparkHAFailover = Try(immutableSeq(spark.getStringList("master"))).toOption.toSeq.flatten
+
+  lazy val SparkMasterURI: String = SparkHAFailover match {
+    case single if single.size == 1 ⇒
+       if (single.contains("local")) single.head else toSparkUri(toMaster(single.head))
+    case ha if ha.size > 1 =>
+      val withFailover = (for(host <- ha) yield toMaster(host)).mkString(",")
+      toSparkUri(withFailover)
+    case _ => "local"
   }
 
+  val SparkEnabled: Boolean = Option(spark.getBoolean("enabled")) getOrElse true
   val SparkAppName: String = Option(spark.getString("app-name")) getOrElse "Test"
   val SparkLoadJars: immutable.IndexedSeq[String] = immutableSeq(spark.getStringList("load-jars")).toVector
+  val SparkLoadDefaults: Boolean = Option(spark.getBoolean("load-defaults")) getOrElse true
+  val SparkCoresMax: Int = spark.getInt("cores-max")
 
+  val CassandraEnabled: Boolean = Option(cassandra.getBoolean("enabled")) getOrElse true
   val CassandraClusterName: String = cassandra.getString("name")
   val CassandraKeyspace: String = cassandra.getString("keyspace")
   val CassandraSeedNodes: immutable.IndexedSeq[String] = immutableSeq(cassandra.getStringList("connection.seed-nodes")).toVector
 
   /* Auth */
-  val CassandraAuthUsername: String = cassandra.getString("connection.auth.username")
-  val CassandraAuthPassword: String = cassandra.getString("connection.auth.password")
+  val CassandraAuthUsername: String =
+    Try(cassandra.getString("connection.auth.username")).toOption orElse sys.props.get("cassandra.username") getOrElse "cassandra"
+
+  val CassandraAuthPassword: String =
+    Try(cassandra.getString("connection.auth.password")).toOption orElse sys.props.get("cassandra.password") getOrElse "cassandra"
+
   val CassandraAuthFactoryClass: String = cassandra.getString("connection.auth.auth-impl")
 
   /* Optional environment configurations and tuning, with fallback to defaults. */
@@ -84,9 +100,20 @@ final class SparkCassandraSettings(val config: Config) {
     ("cassandra.connection.reconnection_delay_ms.max", CassandraReconnectUnreachableAfterMaxDelay.toString),
     ("cassandra.input.split.size", CassandraSplitSize.toString),
     ("cassandra.input.page.row.size", CassandraPagedRows.toString),
-    // TODO add CassandraBatchMaxBytes, CassandraConcurrentWrites, CassandraBatchRowSize
+    ("cassandra.output.concurrent.writes", CassandraConcurrentWrites.toString),
+    ("cassandra.output.batch.size.rows", CassandraBatchRowSize.toString),
+    ("cassandra.output.batch.size.bytes", CassandraBatchMaxBytes.toString),
     ("cassandra.query.retry.count", CassandraRetryCount.toString),
     ("cassandra.username", CassandraAuthUsername),
-    ("cassandra.password", CassandraAuthPassword)/*,
-    ("cassandra.auth.conf.factory.class", CassandraAuthFactoryClass)*/)
+    ("cassandra.password", CassandraAuthPassword),
+    ("cassandra.auth.conf.factory.class", CassandraAuthFactoryClass))
+
+
+  private def toSparkUri(hostPort: String): String = new URI(s"spark://$hostPort").toString
+
+  private def toMaster(value: String): String = value match {
+    case host if host.nonEmpty              ⇒ s"$host:${spark.getInt("port")}"
+    case other                              ⇒ throw new IllegalArgumentException(s"Unsupported master host configuration in reference.conf '$other'")
+  }
+
 }
