@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cassandra
 
 import sbt._
 import sbt.Keys._
