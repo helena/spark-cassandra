@@ -3,7 +3,7 @@ spark-cassandra
 
 An [Akka Extension](http://doc.akka.io/docs/akka/snapshot/intro/what-is-akka.html) for easy integration of [Spark](http://spark.apache.org) and [Cassandra](http://cassandra.apache.org) in Akka micro services, etc.
 
-[Spark Streaming](http://spark.apache.org/streaming/) is currently being added to the core SparkContext in place currently. I am adding it to the [connector project]: (https://github.com/datastax/spark-cassandra-connector/issues/55)
+[Spark Streaming](http://spark.apache.org/streaming/) is currently being added to the core SparkContext in place currently. I am adding it to [cassandra-driver-spark](https://github.com/datastax/spark-cassandra-connector/issues/55)
 
 Full documentation coming, this project is still being developed, but for now:
 
