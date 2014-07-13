@@ -14,7 +14,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
- 
+
 import sbt._
 import sbt.Keys._
 
@@ -26,12 +26,12 @@ object SparkCassandraBuild extends Build {
     id = "root",
     base = file("."),
     settings = parentSettings,
-    aggregate = Seq(extension, examples)
+    aggregate = Seq(extension, samples)
   )
 
   lazy val extension = LibraryProject("spark-cassandra", Dependencies.extension)
 
-  lazy val examples = LibraryProject("spark-cassandra-examples", Dependencies.examples)
+  lazy val samples = LibraryProject("spark-cassandra-samples", Dependencies.samples)
 
   def LibraryProject(name: String, deps: Seq[ModuleID], cpd: Seq[ClasspathDep[ProjectReference]] = Seq.empty): Project =
     Project(name, file(name), settings = defaultSettings ++ Seq(libraryDependencies ++= Dependencies.testkit ++ deps), dependencies = cpd)
@@ -71,6 +71,6 @@ object Dependencies {
 
   val extension = spark ++ metrics ++ Seq(akkaCluster,  cassSparkConnector)
 
-  val examples = spark ++ metrics ++ Seq(akkaCluster, cassSparkConnector)
+  val samples = spark ++ metrics ++ Seq(akkaCluster, cassSparkConnector)
 
 }
