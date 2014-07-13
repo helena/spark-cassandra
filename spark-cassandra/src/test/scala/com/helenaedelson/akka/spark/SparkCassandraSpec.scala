@@ -47,12 +47,12 @@ class SparkCassandraSpec extends AbstractSpec {
     }
 
     "read and write to cassandra" in {
+      /* TODO work tests and then do automatic rollback
       CassandraConnector(spark.getConf).withSessionDo { session =>
         session.execute("CREATE KEYSPACE test2 WITH REPLICATION = {'class': 'SimpleStrategy', 'replication_factor': 1 }")
         session.execute("CREATE TABLE test2.words (word text PRIMARY KEY, count int)")
       }
-
-      /* TODO work tests and then delete test table */
+      */
       import com.datastax.spark._
 
     }
